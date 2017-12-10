@@ -24,7 +24,7 @@ CORS(app)
 
 gmaps = googlemaps.Client(key='AIzaSyAR6i805b5TRZbDCdq2aCB0qimdH0aU2yc')
 
-df_acidentes = pd.read_csv('../data/acidentes.csv', error_bad_lines=False, encoding='utf-8')
+df_acidentes = pd.read_csv('acidentes.csv', error_bad_lines=False, encoding='utf-8')
 
 
 # ===========================================================
