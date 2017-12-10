@@ -100,7 +100,7 @@ function PlotarMarcador(lat, lng) {
         shadow: null,
         zIndex: 999,
         position: posicao,
-        icon: new google.maps.MarkerImage('http://lh3.ggpht.com/hx6IeSRualApBd7KZB9s2N7bcHZIjtgr9VEuOxHzpd05_CZ6RxZwehpXCRN-1ps3HuL0g8Wi=w9-h9'),
+        icon: new google.maps.MarkerImage('https://lh3.ggpht.com/hx6IeSRualApBd7KZB9s2N7bcHZIjtgr9VEuOxHzpd05_CZ6RxZwehpXCRN-1ps3HuL0g8Wi=w9-h9'),
     })
 
     all_markers.push(marker)
