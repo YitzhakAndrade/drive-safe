@@ -14,137 +14,8 @@ $(window).resize(function () {
 var map
 var directionsRenderer
 var directionsService
-var opendInfoWindow
-var all_markers = {}
-var all_markers_keys = []
-var queryStr = ''
+var all_markers = []
 
-function carregarPostos() {
-    var bounds = map.getBounds();
-    var latMin = bounds.getSouthWest().lat().toString();
-    var latMax = bounds.getNorthEast().lat().toString();
-    var lngMin = bounds.getSouthWest().lng().toString();
-    var lngMax = bounds.getNorthEast().lng().toString();
-    queryStr = '?latMin=' + latMin + "&latMax=" + latMax + "&lngMin=" + lngMin + "&lngMax=" + lngMax;
-
-    jQuery.ajax({
-        //url: 'py/recuperar-postos.py' + queryStr,
-        url: 'http://yitzhakstone.pythonanywhere.com/MeuPosto/api/recuperar-postos' + queryStr,
-        type: "GET",
-        contentType: "application/json; charset=utf-8",
-        dataType: "json",
-        success: function (data) {
-            data.forEach(AddMarker);
-        },
-        failure: function (msg) { alert("Ocorreu um erro !!! "); }
-    });
-}
-
-
-function AddMarker(value, index, ar) {
-
-    //$('#rating' + value.ID.toString()).rating();
-
-    if (all_markers[value.ID] != undefined)
-    {
-        return;
-    }
-
-    // Create a marker and set its position.
-    var myLatLng = { lat: parseFloat(value.Lat), lng: parseFloat(value.Lng) };
-    var marker = new google.maps.Marker({
-        map: map,
-        position: myLatLng,
-        title: value.Nome
-    });
-
-    var nota = value.Avaliacao != 'None' ? parseFloat(value.Avaliacao).toFixed(1) : 'Sem nota';
-
-    var modalPosto = '\
-        <div id="modalPosto' + value.ID + '" class="modal fade" role="dialog">\
-            <div class="modal-dialog">\
-                <div class="modal-content">\
-                    <div class="modal-header">\
-                        <button type="button" class="close" data-dismiss="modal">&times;</button>\
-                        <h4 class="modal-title">[' + value.ID + '] ' + value.Nome + '</h4>\
-                    </div>\
-                    <div class="modal-body">\
-                        <p>' + value.Logr + ', ' + value.Num + ' - ' + value.Bairro + '</p>\
-                        <p>\
-                            <div style="display: inline-block;"\
-                                id="AvalPosto' + value.ID + '"\
-                                data-idPosto="' + value.ID + '"\
-                                data-path="lib/raty-2.7.0/images/red"\
-                                data-notaMedia="' + value.Avaliacao + '\
-                                data-notaUser="' + value.Avaliacao + '"></div>\
-                            <div style="display: inline-block; margin-left: 5px;">(Média: ' + nota + ')</div>\
-                        </p>\
-                        <p><table class="preco-comb">\
-                            <tr>\
-                                <th>G</th>\
-                                <th>A</th>\
-                                <th>D</th>\
-                                <th>GNV</th>\
-                                <th>GA</th>\
-                                <th>GP</th>\
-                            </tr>\
-                            <tr>\
-                                <td>' + value.ValorGasolina.replace("None", "-")        + '</td>\
-                                <td>' + value.ValorAlcool.replace("None", "-")          + '</td>\
-                                <td>' + value.ValorDiesel.replace("None", "-")          + '</td>\
-                                <td>' + value.ValorGNV.replace("None", "-")             + '</td>\
-                                <td>' + value.ValorGasolinaAdt.replace("None", "-")     + '</td>\
-                                <td>' + value.ValorGasolinaPremium.replace("None", "-") + '</td>\
-                            </tr>\
-                        </table></p>\
-                        <p><a href="#" onClick="tracarRota(\'' + value.Lat + ', ' + value.Lng + '\')">Rota</a></p>\
-                    </div>\
-                    <div class="modal-footer">\
-                        <button type="button" class="btn btn-default" data-dismiss="modal">Fechar</button>\
-                    </div>\
-                </div>\
-            </div>\
-        </div>';
-
-    $('#modaisPostos').append(modalPosto);
-
-    marker.set("idPosto", value.ID);
-
-    // abre modal com as info do posto ao clicar no marker
-    marker.addListener('click', function () {
-
-        // Recupera o id do posto
-        var idPosto = this.get("idPosto");
-
-        $('#modalPosto' + idPosto).modal();
-
-        // Inicializa as estrelinhas!
-        $('#AvalPosto' + idPosto).raty({
-            // Quantas estrelas vão aparecer marcadas
-            score: function() {
-                var scoreUser = $(this).attr('data-notaUser');
-                var scoreAvg = $(this).attr('data-notaMedia');
-                if (scoreUser != undefined){
-                    return scoreUser;
-                } else {
-                    return scoreAvg;
-                }
-            },
-            // Evento ao avaliar
-            click: function(score, evt) {
-                var idPostoRaty = $('#' + this.id).attr('data-idPosto')
-                return avaliarPosto(idPostoRaty, score);
-            },
-            // Botão de cancelar avaliação
-            cancel: true
-        });
-
-    });
-
-    all_markers[value.ID] = marker;
-    all_markers_keys.push(value.ID);
-
-}
 
 function initialize() {
     var mapProp = {
@@ -185,22 +56,6 @@ function TracarRota(origem, destino) {
     })
 }
 
-function RedefinirIcones() {
-
-    all_markers_keys.forEach( function(idposto) {
-        all_markers[idposto].setIcon();
-    });
-
-}
-
-function MarcarMelhores(data, ix) {
-    var iconText = ix + 1;
-    var iconPath = "http://mt.google.com/vt/icon?psize=16&font=fonts/Roboto-Regular.ttf&color=ff330000&name=icons/spotlight/spotlight-waypoint-a.png&ax=44&ay=48&scale=1&text=" + iconText.toString();
-
-    if (ix < 5) {
-        all_markers[data.ID].setIcon(iconPath);
-    }
-}
 
 $(document).ready(function () {
 
@@ -225,7 +80,7 @@ function BuscarAcidentes(origem, destino) {
     }
     all_markers = []
 
-    var url = 'http://localhost:5000/BuscarAcidentes?origem=' + origem + '&destino=' + destino
+    var url = 'https://drive-safe-hackacity.herokuapp.com/BuscarAcidentes?origem=' + origem + '&destino=' + destino
 
     $.get(url).done(function (data) {
         $.each(JSON.parse(data.acidentes), function (index, value) {
@@ -245,11 +100,7 @@ function PlotarMarcador(lat, lng) {
         shadow: null,
         zIndex: 999,
         position: posicao,
-        //title: 'title',
-        icon: new google.maps.MarkerImage('http://maps.gstatic.com/mapfiles/mobile/mobileimgs2.png',
-        new google.maps.Size(22,22),
-        new google.maps.Point(0,18),
-        new google.maps.Point(11,11))
+        icon: new google.maps.MarkerImage('http://lh3.ggpht.com/hx6IeSRualApBd7KZB9s2N7bcHZIjtgr9VEuOxHzpd05_CZ6RxZwehpXCRN-1ps3HuL0g8Wi=w9-h9'),
     })
 
     all_markers.push(marker)
