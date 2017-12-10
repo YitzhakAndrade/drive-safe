@@ -59,9 +59,6 @@ function TracarRota(origem, destino) {
 
 $(document).ready(function () {
 
-    $('#txtOrigem').val('av artur guimaraes, 976')
-    $('#txtDestino').val('rua walter ianni, 355')
-
     $("#btnBuscarRota").click(function(e) {
         e.preventDefault()
 
@@ -70,6 +67,20 @@ $(document).ready(function () {
 
         TracarRota(origem, destino)
         BuscarAcidentes(origem, destino)
+    })
+
+    $('#menuConquistas').click(function (e) {
+        BootstrapDialog.alert({
+            title: 'Conquistas',
+            message: '<image src="https://image.flaticon.com/icons/png/512/123/123410.png" style="max-height:100px;margin-right:40px;"><b style="font-size:20px;">Primeira Jornada</b><br/><br/><br/><image src="http://moziru.com/images/places-clipart-first-place-11.png" style="max-height:100px;margin-right:40px;"><b style="font-size:20px;">Motorista Podium</b><br/>',
+        });
+    })
+
+    $('#menuHistorico').click(function (e) {
+        BootstrapDialog.alert({
+            title: 'Histórico',
+            message: '<table><tr><td><image src="corrida1.png" style="max-height:100px;margin-right:40px;"></td><td><b style="font-size:14px;">18 KM percorridos<br />327 pontos conquistados</b></td><td style="padding-left:80px;"><a class="btn btn-default">Detalhes</a></td></tr><tr><td><br/><image src="corrida2.png" style="max-height:100px;margin-right:40px;"></td><td><b style="font-size:14px;">23,1 KM percorridos<br />143 pontos conquistados</b></td><td style="padding-left:80px;"><a class="btn btn-default">Detalhes</a></td></tr></table>',
+        });
     })
 })
 
