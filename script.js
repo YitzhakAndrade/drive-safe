@@ -92,7 +92,7 @@ function BuscarAcidentes(origem, destino) {
     all_markers = []
 
     var url = 'https://drive-safe-hackacity.herokuapp.com/BuscarAcidentes?origem=' + origem + '&destino=' + destino
-    url = 'http://localhost:5000/BuscarAcidentes?origem=' + origem + '&destino=' + destino
+    //url = 'http://localhost:5000/BuscarAcidentes?origem=' + origem + '&destino=' + destino
 
     $.get(url).done(function (data) {
         $.each(JSON.parse(data.acidentes), function (index, value) {
